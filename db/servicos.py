@@ -19,13 +19,6 @@ def listar_servicos():
     except Exception as e:
         raise RuntimeError(f"Erro ao listar serviços: {e}")
 
-# def cadastrar_servico(nome, valor):
-#     """Cadastra um novo serviço."""
-#     supabase = iniciar_supabase()
-#     response = supabase.from_("servicos").insert({"nome": nome, "valor": valor}).execute()
-#     if response.error:
-#         raise Exception(response.error.message)
-
 def cadastrar_servico(nome, valor):
     """Cadastra um serviço no banco Supabase."""
     supabase = iniciar_supabase()
@@ -34,12 +27,16 @@ def cadastrar_servico(nome, valor):
         raise RuntimeError("Cliente Supabase não foi inicializado.")
 
     try:
+        # Realiza a inserção
         response = supabase.from_("servicos").insert({"nome": nome, "valor": valor}).execute()
 
-        if response.status_code == 201:
+        # Verifica se a resposta contém dados ou um erro
+        if response.data:
             return "Serviço cadastrado com sucesso."
+        elif response.error:
+            raise Exception(f"Erro ao cadastrar serviço: {response.error}")
         else:
-            raise Exception(f"Erro ao cadastrar serviço: {response.json()}")
+            raise Exception("Erro desconhecido ao cadastrar serviço.")
     except Exception as e:
         raise Exception(f"Erro ao interagir com o Supabase: {e}")
 
@@ -47,28 +44,50 @@ def cadastrar_servico(nome, valor):
 def atualizar_valor_servico(servico_id, novo_valor):
     """Atualiza o valor de um serviço existente."""
     supabase = iniciar_supabase()
-    response = supabase.from_("servicos").update({"valor": novo_valor}).eq("id", servico_id).execute()
-    if response.error:
-        raise Exception(response.error.message)
+
+    if not supabase:
+        raise RuntimeError("Cliente Supabase não foi inicializado.")
+
+    try:
+        # Realizando a atualização no banco de dados
+        response = supabase.from_("servicos").update({"valor": novo_valor}).eq("id", servico_id).execute()
+
+        # Verificando se a resposta contém dados (se a atualização foi bem-sucedida)
+        if response.data:
+            return f"Valor do serviço atualizado para R${novo_valor:.2f}."
+
+        # Caso não tenha dados, verifica se houve erro na resposta
+        if response.error:
+            raise Exception(f"Erro ao atualizar o valor do serviço: {response.error.message}")
+
+        # Caso nenhum dado ou erro seja encontrado
+        raise Exception("Erro inesperado ao atualizar o valor do serviço.")
+
+    except Exception as e:
+        raise Exception(f"Erro ao interagir com o Supabase: {e}")
+
 
 def deletar_servico(servico_id):
     """Deleta um serviço."""
     supabase = iniciar_supabase()
-    response = supabase.from_("servicos").delete().eq("id", servico_id).execute()
-    if response.error:
-        raise Exception(response.error.message)
 
-def deletar_atendimento(atendimento_id):
-    supabase = iniciar_supabase()
-    """Exclui um atendimento do banco de dados com base no ID."""
+    if not supabase:
+        raise RuntimeError("Cliente Supabase não foi inicializado.")
+
     try:
-        # Executa a exclusão no Supabase
-        response = supabase.from_("atendimentos").delete().eq("id", atendimento_id).execute()
+        response = supabase.from_("servicos").delete().eq("id", servico_id).execute()
 
-        # Verifica se a exclusão foi bem-sucedida
-        if response.status_code == 200 and response.data:
-            st.success(f"Atendimento com ID {atendimento_id} foi excluído com sucesso.")
-        else:
-            st.warning(f"Nenhum atendimento encontrado com ID {atendimento_id}.")
+        # Verifique se a resposta contém dados (se o serviço foi deletado com sucesso)
+        if response.data:
+            return "Serviço deletado com sucesso."
+
+        # Caso não tenha dados, tente capturar o erro
+        if response.error:
+            raise Exception(f"Erro ao deletar serviço: {response.error}")
+
+        # Caso nenhum erro ou dados sejam encontrados
+        raise Exception("Erro inesperado ao deletar o serviço.")
+
     except Exception as e:
-        st.error(f"Erro ao excluir atendimento: {e}")
+        raise Exception(f"Erro ao interagir com o Supabase: {e}")
+

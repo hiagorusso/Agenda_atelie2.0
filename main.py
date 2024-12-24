@@ -1,6 +1,6 @@
 import streamlit as st
-from db.servicos import cadastrar_servico, listar_servicos, deletar_servico, deletar_atendimento
-from db.atendimentos import adicionar_atendimento, listar_atendimentos
+from db.servicos import cadastrar_servico, listar_servicos, deletar_servico
+from db.atendimentos import adicionar_atendimento, listar_atendimentos, deletar_atendimento
 from db.servicos import atualizar_valor_servico
 #from services.resumo import consultar_resumo
 from datetime import datetime
@@ -188,7 +188,7 @@ elif menu == "Alterar Valor do Serviço":
 
 elif menu == "Excluir Atendimento":
     st.header("Excluir Atendimento")
-    atendimentos = listar_atendimentos()
+    atendimentos = listar_atendimentos()  # Chama a função para listar os atendimentos
     if atendimentos:
         atendimento_selecionado = st.selectbox(
             "Selecione o Atendimento para excluir",
@@ -196,7 +196,7 @@ elif menu == "Excluir Atendimento":
             format_func=lambda x: f"Serviço: {x['servico']} | Data: {x['data']}"
         )
         if st.button("Excluir Atendimento"):
-            deletar_atendimento(atendimento_selecionado['id'])
+            deletar_atendimento(atendimento_selecionado['id'])  # Exclui o atendimento
             st.success("Atendimento excluído com sucesso!")
     else:
         st.info("Nenhum atendimento registrado para excluir.")
