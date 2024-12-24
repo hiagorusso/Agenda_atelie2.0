@@ -1,0 +1,4 @@
+supabase-py
+streamlit
+gotrue
+pandas
