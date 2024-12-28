@@ -25,29 +25,59 @@ def listar_atendimentos():
         print(f"Erro ao listar atendimentos: {e}")
         return None
 
+# def adicionar_atendimento(data, servico_nome):
+#     """Adiciona um atendimento à tabela 'atendimentos'."""
+#     supabase = iniciar_supabase()
+#     if supabase is None:
+#         raise RuntimeError("Cliente Supabase não foi inicializado.")
+#
+#     try:
+#         # Cria o payload para a inserção
+#         payload = {
+#             "data": data,
+#             "servico": servico_nome,
+#         }
+#
+#         # Insere o atendimento no Supabase
+#         response = supabase.from_("atendimentos").insert(payload).execute()
+#
+#         # Verifica se a inserção foi bem-sucedida
+#         if response.data:  # Se a resposta contiver dados, a inserção foi bem-sucedida
+#             return True
+#         else:
+#             raise RuntimeError(f"Erro ao adicionar atendimento: {response.error}")
+#     except Exception as e:
+#         raise RuntimeError(f"Erro ao registrar atendimento: {e}")
 def adicionar_atendimento(data, servico_nome):
-    """Adiciona um atendimento à tabela 'atendimentos'."""
+    """Cadastra um atendimento no banco de dados com base no nome do serviço."""
     supabase = iniciar_supabase()
-    if supabase is None:
-        raise RuntimeError("Cliente Supabase não foi inicializado.")
 
     try:
-        # Cria o payload para a inserção
-        payload = {
+        # Buscar o serviço pelo nome para obter o ID
+        servico = supabase.from_("servicos").select("id, nome").eq("nome", servico_nome).execute()
+
+        if not servico.data:
+            raise Exception("Serviço não encontrado.")
+
+        servico_id = servico.data[0]["id"]
+
+        # Inserir o atendimento com o ID e nome do serviço
+        response = supabase.from_("atendimentos").insert({
             "data": data,
-            "servico": servico_nome,
-        }
+            "servico_id": servico_id,
+            "servico": servico_nome
+        }).execute()
 
-        # Insere o atendimento no Supabase
-        response = supabase.from_("atendimentos").insert(payload).execute()
-
-        # Verifica se a inserção foi bem-sucedida
-        if response.data:  # Se a resposta contiver dados, a inserção foi bem-sucedida
-            return True
+        # Verifica se a resposta tem dados (usa .data para acessar)
+        if response.data:
+            return "Atendimento cadastrado com sucesso."
         else:
-            raise RuntimeError(f"Erro ao adicionar atendimento: {response.error}")
+            # Verifica se há mensagem de erro na resposta
+            error_message = response.error.message if response.error else "Erro desconhecido"
+            raise Exception(f"Erro ao cadastrar atendimento: {error_message}")
+
     except Exception as e:
-        raise RuntimeError(f"Erro ao registrar atendimento: {e}")
+        raise Exception(f"Erro ao interagir com o Supabase: {e}")
 
 
 def deletar_atendimento(atendimento_id):

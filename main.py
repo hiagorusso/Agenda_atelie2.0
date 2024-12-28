@@ -2,10 +2,10 @@ import streamlit as st
 from db.servicos import cadastrar_servico, listar_servicos, deletar_servico
 from db.atendimentos import adicionar_atendimento, listar_atendimentos, deletar_atendimento
 from db.servicos import atualizar_valor_servico
-#from services.resumo import consultar_resumo
+from services.resumo import consultar_resumo
 from datetime import datetime
 from db.connection import iniciar_supabase
-#from services.export import gerar_resumo_pdf, gerar_resumo_excel
+from services.export import gerar_resumo_pdf, gerar_resumo_excel
 
 supabase = iniciar_supabase()
 
@@ -84,54 +84,54 @@ elif menu == "Registrar Atendimento":
     except Exception as e:
         st.error(f"Erro ao carregar serviços: {e}")
 
-# elif menu == "Consultar Resumo":
-#     st.header("Consultar Resumo Mensal")
-#
-#     # Seleção do mês e ano
-#     mes = st.selectbox("Mês", options=list(range(1, 13)), format_func=lambda x: f"{x:02}")
-#     ano = st.number_input("Ano", min_value=2000, max_value=2100, value=datetime.now().year)
-#
-#     if st.button("Consultar"):
-#         try:
-#             # Chama a função para obter os atendimentos
-#             atendimentos, total = consultar_resumo(mes, ano)
-#             total_liquido = total * 0.7  # Valor líquido após 30% de desconto
-#
-#             # Verifica se há atendimentos no período
-#             if atendimentos:
-#                 st.write(f"Resumo Mensal de Atendimentos para {mes:02}/{ano}:")
-#                 for item in atendimentos:
-#                     st.write(
-#                         f"Serviço: {item['nome']} | Quantidade: {item['quantidade']} | Total: R${item['total']:.2f}"
-#                     )
-#                 st.write(f"**Valor total do mês:** R${total:.2f}")
-#                 st.write(f"**Valor líquido (após 30%):** R${total_liquido:.2f}")
-#
-#                 # Exportar PDF
-#                 with st.spinner("Gerando PDF..."):
-#                     pdf_path = gerar_resumo_pdf(atendimentos, total, total_liquido)
-#                     with open(pdf_path, "rb") as pdf_file:
-#                         st.download_button(
-#                             label="📄 Baixar Resumo em PDF",
-#                             data=pdf_file,
-#                             file_name="resumo_mensal.pdf",
-#                             mime="application/pdf"
-#                         )
-#
-#                 # Exportar Excel
-#                 with st.spinner("Gerando Excel..."):
-#                     excel_path = gerar_resumo_excel(atendimentos, total, total_liquido)
-#                     with open(excel_path, "rb") as excel_file:
-#                         st.download_button(
-#                             label="📊 Baixar Resumo em Excel",
-#                             data=excel_file,
-#                             file_name="resumo_mensal.xlsx",
-#                             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-#                         )
-#             else:
-#                 st.info(f"Nenhum atendimento encontrado para {mes:02}/{ano}.")
-#         except Exception as e:
-#             st.error(f"Erro ao consultar resumo: {e}")
+elif menu == "Consultar Resumo":
+    st.header("Consultar Resumo Mensal")
+
+    # Seleção do mês e ano
+    mes = st.selectbox("Mês", options=list(range(1, 13)), format_func=lambda x: f"{x:02}")
+    ano = st.number_input("Ano", min_value=2000, max_value=2100, value=datetime.now().year)
+
+    if st.button("Consultar"):
+        try:
+            # Chama a função para obter os atendimentos
+            atendimentos, total = consultar_resumo(mes, ano)
+            total_liquido = total * 0.7  # Valor líquido após 30% de desconto
+
+            # Verifica se há atendimentos no período
+            if atendimentos:
+                st.write(f"Resumo Mensal de Atendimentos para {mes:02}/{ano}:")
+                for item in atendimentos:
+                    st.write(
+                        f"Serviço: {item['nome']} | Quantidade: {item['quantidade']} | Total: R${item['total']:.2f}"
+                    )
+                st.write(f"**Valor total do mês:** R${total:.2f}")
+                st.write(f"**Valor líquido (após 30%):** R${total_liquido:.2f}")
+
+                # Exportar PDF
+                with st.spinner("Gerando PDF..."):
+                    pdf_path = gerar_resumo_pdf(atendimentos, total, total_liquido)
+                    with open(pdf_path, "rb") as pdf_file:
+                        st.download_button(
+                            label="📄 Baixar Resumo em PDF",
+                            data=pdf_file,
+                            file_name="resumo_mensal.pdf",
+                            mime="application/pdf"
+                        )
+
+                # Exportar Excel
+                with st.spinner("Gerando Excel..."):
+                    excel_path = gerar_resumo_excel(atendimentos, total, total_liquido)
+                    with open(excel_path, "rb") as excel_file:
+                        st.download_button(
+                            label="📊 Baixar Resumo em Excel",
+                            data=excel_file,
+                            file_name="resumo_mensal.xlsx",
+                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        )
+            else:
+                st.info(f"Nenhum atendimento encontrado para {mes:02}/{ano}.")
+        except Exception as e:
+            st.error(f"Erro ao consultar resumo: {e}")
 
 
 elif menu == "Deletar Serviço":
