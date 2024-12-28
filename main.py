@@ -19,7 +19,26 @@ try:
 except Exception as e:
     print(f"Erro ao acessar a tabela 'servicos': {e}")
 
+# Definir o ícone e o título da página
+st.set_page_config(page_title="Gerenciamento de Atendimentos", page_icon="src/favicon1.png")
 
+# Adicionar imagem de perfil redonda na barra lateral
+profile_image_path  = "src/perfil.jpg"  # Substitua pelo caminho da sua imagem
+
+# Adicionar CSS para tornar a imagem redonda
+st.sidebar.markdown("""
+    <style>
+        .profile-pic {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            margin: 10px auto;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Exibir a imagem redonda na barra lateral usando HTML
+st.sidebar.image(profile_image_path, use_container_width=False)
 
 st.title("Gerenciamento de Atendimentos do Ateliê")
 
