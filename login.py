@@ -35,7 +35,18 @@ def tela_login():
     email = st.sidebar.text_input("Email")
     senha = st.sidebar.text_input("Senha", type="password")
 
-    if st.sidebar.button("Entrar"):
+    # Adiciona o botão de logout na parte inferior da sidebar
+    st.sidebar.markdown("""
+          <style>
+              .entrar-button {
+                  position: absolute;
+                  bottom: 10px;
+                  width: 100%;
+              }
+          </style>
+      """, unsafe_allow_html=True)
+
+    if st.sidebar.button("Entrar", key = "entrar", help = "Entrar na aplicação", use_container_width = True):
         usuario = autenticar_usuario(email, senha)
         if usuario:
             # Salva o usuário autenticado na sessão
